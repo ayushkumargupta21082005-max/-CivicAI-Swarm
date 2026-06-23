@@ -1,0 +1,349 @@
+{
+  "issues": [
+    {
+      "id": "f24cd407-0a97-4420-ae6f-33f7aa2ee27e",
+      "title": "road damaged",
+      "description": "road damaged",
+      "location": "mg road",
+      "ward": "ghaziyabad sector 3",
+      "reporter_name": "Anonymous",
+      "reporter_email": "",
+      "status": "Resolved",
+      "created_at": "2026-06-23T12:32:53.004Z",
+      "updated_at": "2026-06-23T12:39:03.825Z",
+      "report_count": 1,
+      "upvotes": 0,
+      "days_open": 0,
+      "images": [],
+      "comments": [],
+      "history": [
+        {
+          "action": "Created",
+          "timestamp": "2026-06-23T12:32:53.004Z",
+          "actor": "System"
+        },
+        {
+          "action": "Updated: status, actor",
+          "timestamp": "2026-06-23T12:38:00.070Z",
+          "actor": "Admin"
+        },
+        {
+          "action": "Updated: status, actor",
+          "timestamp": "2026-06-23T12:38:06.204Z",
+          "actor": "Admin"
+        },
+        {
+          "action": "Updated: status, assigned_to, notes, estimated_completion, actor",
+          "timestamp": "2026-06-23T12:39:03.825Z",
+          "actor": "Admin"
+        }
+      ],
+      "category": "Roads & Infrastructure",
+      "subcategory": "Road Damage",
+      "department": "Public Works Department",
+      "tags": [
+        "road",
+        "damage",
+        "infrastructure",
+        "repair",
+        "pothole"
+      ],
+      "severity": "Medium",
+      "severity_score": 6,
+      "impact_area": "Neighborhood",
+      "affected_people_estimate": 300,
+      "health_risk": false,
+      "safety_risk": true,
+      "priority_score": 80,
+      "priority_label": "P1-Critical",
+      "sla_hours": 24,
+      "escalate_immediately": true,
+      "resolution": {
+        "immediate_actions": [
+          "Dispatch an inspection team to assess the exact nature and extent of the road damage at MG Road.",
+          "Erect temporary safety barricades, warning signs, and cones around the damaged section to prevent accidents and guide traffic."
+        ],
+        "short_term_steps": [
+          "Conduct immediate temporary patching or filling of the damaged road section to ensure basic safety and drivability, prioritizing critical areas.",
+          "Prepare a detailed engineering report outlining the scope of permanent repair, materials required, and estimated cost.",
+          "Initiate procurement processes for necessary materials and equipment, and allocate budget for the permanent repair project."
+        ],
+        "long_term_solution": "Undertake comprehensive road repair, which may include full resurfacing of the damaged section, pothole filling with durable materials, or structural base repair, to restore the road to a safe and robust condition.",
+        "responsible_teams": [
+          "Public Works Department (Primary)",
+          "Traffic Management Division (for diversions and safety during repairs)",
+          "Engineering Department (for design and supervision)"
+        ],
+        "estimated_resolution_days": 30,
+        "resources_needed": [
+          "Road inspection vehicle and personnel",
+          "Temporary barricades, traffic cones, and warning signs",
+          "Asphalt patching material and equipment (e.g., asphalt paver, roller)",
+          "Road repair crew and labor",
+          "Traffic control personnel"
+        ],
+        "success_metrics": [
+          "Road surface is smooth, even, and free of defects at MG Road.",
+          "No new complaints received regarding the repaired section for a specified period (e.g., 6 months).",
+          "Traffic flow and safety are fully restored in the affected area."
+        ],
+        "citizen_advisory": "Citizens are advised to drive with caution around the marked damaged area and follow all temporary traffic signs. Please report any further deterioration or new damage via the official municipal complaint portal."
+      },
+      "is_duplicate": false,
+      "duplicate_ids": [],
+      "assigned_to": "KALLU KALIA",
+      "notes": "road repaired..",
+      "estimated_completion": "2026-06-23"
+    },
+    {
+      "id": "dfa650d9-c0e2-4860-9277-300e4bc49d7e",
+      "title": "NO STREET LIGHTS",
+      "description": "IN NIGHT TIME VISIBLITY NEARLY ZERO WITHOUT HAND TORCHES",
+      "location": "BLW",
+      "ward": "VARANASI",
+      "reporter_name": "AYUSH",
+      "reporter_email": "ayushkumarguptacollage@gmail.com",
+      "status": "In Progress",
+      "created_at": "2026-06-23T12:42:23.008Z",
+      "updated_at": "2026-06-23T20:48:14.639Z",
+      "report_count": 1,
+      "upvotes": 0,
+      "days_open": 0,
+      "images": [],
+      "comments": [],
+      "history": [
+        {
+          "action": "Created",
+          "timestamp": "2026-06-23T12:42:23.008Z",
+          "actor": "System"
+        },
+        {
+          "action": "Updated: status, actor",
+          "timestamp": "2026-06-23T20:48:14.639Z",
+          "actor": "Admin"
+        }
+      ],
+      "category": "Roads & Infrastructure",
+      "subcategory": "Street Lighting",
+      "department": "Public Works Department",
+      "tags": [
+        "street lighting",
+        "night visibility",
+        "public safety",
+        "infrastructure",
+        "darkness"
+      ],
+      "severity": "Critical",
+      "severity_score": 9,
+      "impact_area": "Neighborhood",
+      "affected_people_estimate": 750,
+      "health_risk": true,
+      "safety_risk": true,
+      "priority_score": 96,
+      "priority_label": "P1-Critical",
+      "sla_hours": 24,
+      "escalate_immediately": true,
+      "resolution": {
+        "immediate_actions": [
+          "Deploy temporary, portable lighting (e.g., generator-powered floodlights, emergency solar lights) in critically dark intersections and pedestrian crossings within BLW.",
+          "Increase public safety patrols (police/security) in affected areas during night hours to deter crime and assist residents.",
+          "Issue a public safety advisory via local media and community channels, warning residents about the reduced visibility and advising extreme caution."
+        ],
+        "short_term_steps": [
+          "Conduct a rapid assessment to identify all specific streets and sections within BLW lacking streetlights, prioritizing based on traffic volume and pedestrian activity.",
+          "Procure and install temporary, stand-alone solar-powered streetlights in high-risk zones identified in the rapid assessment.",
+          "Organize a community meeting or feedback mechanism for BLW residents to gather specific concerns, incident reports, and priority locations."
+        ],
+        "long_term_solution": "Develop and implement a comprehensive street lighting master plan for BLW. This includes a detailed engineering design for new energy-efficient LED streetlights, procurement of poles and fixtures, establishment of grid connections or independent solar power systems, and a phased installation across all identified unlit areas. The plan will also include a sustainable funding model for ongoing maintenance and future expansion.",
+        "responsible_teams": [
+          "Public Works Department",
+          "Urban Planning & Development Department",
+          "Finance Department",
+          "Local City Council / Ward Representatives"
+        ],
+        "estimated_resolution_days": 365,
+        "resources_needed": [
+          "Emergency lighting equipment (generators, temporary solar lights)",
+          "Capital funding for streetlight infrastructure project (design, procurement, installation)",
+          "Skilled electrical engineers and installation teams",
+          "Heavy machinery (cranes, utility vehicles)",
+          "Materials (poles, LED luminaires, cables, control systems)"
+        ],
+        "success_metrics": [
+          "90% of identified critical roads and pedestrian paths in BLW have functional streetlights within 12 months.",
+          "X% reduction in reported night-time traffic incidents and pedestrian accidents in BLW.",
+          "Positive change in citizen perception of night-time safety and visibility (measured via post-implementation survey).",
+          "Establishment of a dedicated streetlight maintenance schedule and budget for BLW."
+        ],
+        "citizen_advisory": "Citizens are advised to exercise extreme caution when traveling in BLW at night, utilizing personal illumination like flashlights or phone lights. Report specific unlit areas or safety concerns to the Public Works Department hotline. Consider organizing or joining neighborhood watch groups to enhance collective safety awareness. Avoid walking alone in poorly lit areas whenever possible."
+      },
+      "is_duplicate": false,
+      "duplicate_ids": []
+    },
+    {
+      "id": "7a2f367d-4068-4636-b7ec-b6f7ecba402b",
+      "title": "covid19 case found",
+      "description": "in my near by hospital , somebody reported covid19 positive",
+      "location": "Delhi",
+      "ward": "near railway station",
+      "reporter_name": "Prakhar",
+      "reporter_email": "",
+      "status": "Open",
+      "created_at": "2026-06-23T16:49:25.174Z",
+      "updated_at": "2026-06-23T16:49:25.174Z",
+      "report_count": 1,
+      "upvotes": 0,
+      "days_open": 0,
+      "images": [],
+      "comments": [],
+      "history": [
+        {
+          "action": "Created",
+          "timestamp": "2026-06-23T16:49:25.174Z",
+          "actor": "System"
+        }
+      ],
+      "category": "Healthcare",
+      "subcategory": "Disease Outbreak Reporting",
+      "department": "Health Department",
+      "tags": [
+        "covid19",
+        "public health",
+        "pandemic",
+        "disease",
+        "hospital"
+      ],
+      "severity": "High",
+      "severity_score": 8,
+      "impact_area": "Neighborhood",
+      "affected_people_estimate": 50,
+      "health_risk": true,
+      "safety_risk": false,
+      "priority_score": 98,
+      "priority_label": "P1-Critical",
+      "sla_hours": 4,
+      "escalate_immediately": true,
+      "resolution": {
+        "immediate_actions": [
+          "Isolate the confirmed COVID-19 patient in a dedicated facility within the hospital immediately.",
+          "Identify and restrict movement of all individuals (patients, staff, visitors) who had close contact with the confirmed case.",
+          "Notify the Delhi Health Department and relevant public health authorities for epidemiological investigation and support.",
+          "Initiate thorough disinfection of all areas frequented by the positive case within the hospital."
+        ],
+        "short_term_steps": [
+          "Conduct RT-PCR testing for all identified close contacts within the hospital (both staff and patients) and monitor them for symptoms for 7-14 days.",
+          "Reinforce strict adherence to infection control protocols, including proper PPE usage, hand hygiene, and respiratory etiquette for all hospital staff.",
+          "Review and update hospital's infectious disease management protocols and contingency plans based on this incident.",
+          "Issue a public health advisory (without disclosing patient identity) to the local community about the case and reiterate safety measures."
+        ],
+        "long_term_solution": "Establish a robust, integrated infectious disease surveillance and rapid response system within all hospitals in Delhi, coupled with continuous staff training on infection prevention and control, and ensuring adequate availability of isolation facilities and medical supplies. Develop a clear communication strategy for public health emergencies.",
+        "responsible_teams": [
+          "Hospital Administration (Infection Control Team)",
+          "Delhi Health Department",
+          "Local Municipal Corporation (for community-level contact tracing if applicable)",
+          "Medical and Nursing Staff",
+          "Epidemiology Unit"
+        ],
+        "estimated_resolution_days": 21,
+        "resources_needed": [
+          "COVID-19 testing kits (RT-PCR)",
+          "Personal Protective Equipment (PPE) - N95 masks, gloves, gowns, face shields",
+          "Isolation beds and dedicated patient care staff",
+          "Disinfectants and enhanced cleaning staff",
+          "Trained contact tracing teams"
+        ],
+        "success_metrics": [
+          "No secondary transmission within the hospital linked to this case.",
+          "All identified close contacts complete monitoring period without developing symptoms or testing positive.",
+          "Patient recovers and is discharged or transferred appropriately.",
+          "Compliance rate of hospital staff with infection control protocols increases to >95%."
+        ],
+        "citizen_advisory": "Citizens are advised to remain calm but vigilant. Continue practicing good hand hygiene, wearing masks in crowded places and healthcare settings, and maintaining social distancing. Report any COVID-19 like symptoms immediately to health authorities and avoid visiting hospitals unnecessarily unless it's a medical emergency. Get vaccinated and receive booster shots as recommended."
+      },
+      "is_duplicate": false,
+      "duplicate_ids": []
+    },
+    {
+      "id": "c6898a65-3ea5-4738-8357-eacb1fa88196",
+      "title": "water lagging in roads",
+      "description": "to many water in roads causes more traffic",
+      "location": "mumbai",
+      "ward": "mumbai",
+      "reporter_name": "Anonymous",
+      "reporter_email": "",
+      "status": "Open",
+      "created_at": "2026-06-23T20:47:44.760Z",
+      "updated_at": "2026-06-23T20:47:44.760Z",
+      "report_count": 1,
+      "upvotes": 0,
+      "days_open": 0,
+      "images": [],
+      "comments": [],
+      "history": [
+        {
+          "action": "Created",
+          "timestamp": "2026-06-23T20:47:44.760Z",
+          "actor": "System"
+        }
+      ],
+      "category": "Roads & Infrastructure",
+      "subcategory": "Waterlogging",
+      "department": "Municipal Corporation",
+      "tags": [
+        "waterlogging",
+        "traffic congestion",
+        "drainage",
+        "road safety"
+      ],
+      "severity": "Medium",
+      "severity_score": 6,
+      "impact_area": "Neighborhood",
+      "affected_people_estimate": 750,
+      "health_risk": true,
+      "safety_risk": true,
+      "priority_score": 76,
+      "priority_label": "P2-High",
+      "sla_hours": 24,
+      "escalate_immediately": true,
+      "resolution": {
+        "immediate_actions": [
+          "Deploy traffic police and ward volunteers to manage traffic flow around waterlogged areas.",
+          "Mobilize portable dewatering pumps to clear critical road sections and prevent further build-up.",
+          "Identify and clear immediate blockages (e.g., garbage, debris) at visible storm drain inlets."
+        ],
+        "short_term_steps": [
+          "Conduct a rapid assessment of the affected road section's drainage system to identify clogged culverts, grates, and pipes.",
+          "Initiate comprehensive mechanical cleaning of storm drains and sewer lines in the identified zone using jetting machines and suction tankers.",
+          "Inspect road surfaces for depressions or unevenness that contribute to water pooling and schedule temporary patch repairs for immediate leveling."
+        ],
+        "long_term_solution": "Develop and implement a comprehensive stormwater management plan for the area, including upgrading and expanding the existing drainage infrastructure. This involves increasing the capacity of main storm drains, constructing new retention ponds or percolation pits, improving road design with adequate cambers and slopes for efficient water runoff, and integrating green infrastructure solutions where feasible. Regular pre-monsoon desilting and maintenance programs must be institutionalized.",
+        "responsible_teams": [
+          "Municipal Corporation - Stormwater Drainage Department",
+          "Municipal Corporation - Roads Department",
+          "Local Ward Office",
+          "Traffic Police Department"
+        ],
+        "estimated_resolution_days": 180,
+        "resources_needed": [
+          "Dewatering pumps (submersible and trailer-mounted)",
+          "Jetting and suction machines (desilting machines)",
+          "Earthmoving equipment (JCBs, excavators for road repairs/drainage work)",
+          "Skilled labor and sanitation workers",
+          "Traffic cones, barricades, and signage",
+          "Budget allocation for infrastructure upgrade and maintenance"
+        ],
+        "success_metrics": [
+          "Reduction in the duration of waterlogging events on the affected roads by 70% during monsoon.",
+          "Decrease in traffic congestion reports related to waterlogging by 50%.",
+          "Public feedback indicating improved road conditions and drainage efficiency."
+        ],
+        "citizen_advisory": "Citizens are advised to drive slowly and cautiously through waterlogged areas, avoid pushing through deep water, and report specific locations of severe waterlogging or blocked drains to the Municipal Corporation helpline (1916) or relevant ward office immediately. Refrain from littering on roads, as it can block drains and worsen waterlogging."
+      },
+      "is_duplicate": true,
+      "duplicate_ids": [
+        "f24cd407-0a97-4420-ae6f-33f7aa2ee27e"
+      ]
+    }
+  ],
+  "analytics": {}
+}

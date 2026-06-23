@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – CivicAI Swarm</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <a class="nav-logo" href="/"><div class="logo-icon">🏙️</div>CivicAI Swarm</a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/dashboard" class="active">Dashboard</a>
+      <a href="/analytics">Analytics</a>
+      <a href="/admin">Admin</a>
+    </div>
+    <a href="/report" class="btn btn-primary btn-sm nav-cta">+ Report Issue</a>
+  </nav>
+
+  <div class="container page">
+    <!-- Stats Row -->
+    <div class="grid grid-4 mb-24" id="stats-row">
+      <div class="stat-card accent-critical"><div class="stat-label">Total Issues</div><div class="stat-value" id="s-total">—</div></div>
+      <div class="stat-card accent-medium"><div class="stat-label">Open</div><div class="stat-value" id="s-open">—</div></div>
+      <div class="stat-card accent-high"><div class="stat-label">In Progress</div><div class="stat-value" id="s-progress">—</div></div>
+      <div class="stat-card accent-good"><div class="stat-label">Resolved</div><div class="stat-value" id="s-resolved">—</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start">
+      <!-- Issues List -->
+      <div>
+        <div class="flex-between mb-16">
+          <h2>Community Issues</h2>
+          <div style="display:flex;gap:8px">
+            <input class="form-control" id="search-input" placeholder="Search issues…" style="width:220px;height:36px;padding:8px 12px">
+            <button class="btn btn-secondary btn-sm" onclick="loadIssues()">↺ Refresh</button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar" id="filters">
+          <span class="filter-chip active" data-filter="all">All</span>
+          <span class="filter-chip" data-filter="Critical">🔴 Critical</span>
+          <span class="filter-chip" data-filter="High">🟠 High</span>
+          <span class="filter-chip" data-filter="Medium">🔵 Medium</span>
+          <span class="filter-chip" data-filter="Low">🟢 Low</span>
+          <span class="filter-chip" data-status="Open">Open</span>
+          <span class="filter-chip" data-status="In Progress">In Progress</span>
+          <span class="filter-chip" data-status="Resolved">Resolved</span>
+        </div>
+
+        <div id="issues-list">
+          <div class="loading-overlay"><div class="spinner"></div><span>Loading issues…</span></div>
+        </div>
+        <div id="load-more-wrap" style="text-align:center;margin-top:20px;display:none">
+          <button class="btn btn-secondary" id="load-more-btn">Load more</button>
+        </div>
+      </div>
+
+      <!-- Issue Detail Sidebar -->
+      <div id="issue-detail-panel">
+        <div class="card" style="text-align:center;padding:40px 20px;color:var(--ink-3)">
+          <div style="font-size:2rem;margin-bottom:12px">👈</div>
+          <p class="text-sm">Select an issue to view AI analysis and details</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="script.js"></script>
+  <script>
+    let issues = [];
+    let offset = 0;
+    const PAGE = 20;
+    let activeFilter = "all";
+    let activeStatus = "";
+    let searchQuery = "";
+
+    // ── Load Stats ─────────────────────────────────────────────────────────────
+    async function loadStats() {
+      try {
+        const { analytics } = await apiFetch("/analytics");
+        document.getElementById("s-total").textContent = analytics.total;
+        document.getElementById("s-open").textContent = analytics.byStatus.Open || 0;
+        document.getElementById("s-progress").textContent = analytics.byStatus["In Progress"] || 0;
+        document.getElementById("s-resolved").textContent = analytics.byStatus.Resolved || 0;
+      } catch {}
+    }
+
+    // ── Load Issues ────────────────────────────────────────────────────────────
+    async function loadIssues(reset = true) {
+      if (reset) { offset = 0; issues = []; }
+      const container = document.getElementById("issues-list");
+      if (reset) container.innerHTML = `<div class="loading-overlay"><div class="spinner"></div><span>Loading…</span></div>`;
+
+      let url = `/issues?limit=${PAGE}&offset=${offset}`;
+      if (activeFilter !== "all") url += `&severity=${activeFilter}`;
+      if (activeStatus) url += `&status=${activeStatus}`;
+
+      try {
+        const data = await apiFetch(url);
+        let all = data.issues;
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          all = all.filter(i => i.title.toLowerCase().includes(q) || i.description.toLowerCase().includes(q) || i.location.toLowerCase().includes(q));
+        }
+
+        if (reset) issues = all;
+        else issues = [...issues, ...all];
+
+        renderIssues();
+
+        const hasMore = data.total > offset + PAGE;
+        document.getElementById("load-more-wrap").style.display = hasMore ? "block" : "none";
+        offset += PAGE;
+      } catch (e) {
+        container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>Error loading issues</h3><p>${e.message}</p></div>`;
+      }
+    }
+
+    function renderIssues() {
+      const container = document.getElementById("issues-list");
+      if (!issues.length) {
+        container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🏙️</div><h3>No issues found</h3><p>Try a different filter or <a href="/report">report an issue</a>.</p></div>`;
+        return;
+      }
+      container.innerHTML = issues.map(issue => `
+        <div class="issue-card ${severityClass(issue.severity)} mb-8" onclick="showDetail('${issue.id}')" style="margin-bottom:10px">
+          <div class="issue-card-header">
+            <div class="issue-card-title">${issue.title}</div>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              ${severityBadge(issue.severity)}
+              ${statusBadge(issue.status)}
+            </div>
+          </div>
+          <div class="issue-card-desc">${issue.description}</div>
+          <div class="issue-card-meta">
+            <span class="issue-meta-item">📍 ${issue.location}</span>
+            <span class="issue-meta-item">🏷️ ${issue.category || "—"}</span>
+            <span class="issue-meta-item">👥 ${issue.affected_people_estimate || "?"} affected</span>
+            <span class="issue-meta-item">🕐 ${timeAgo(issue.created_at)}</span>
+            ${issue.upvotes ? `<span class="issue-meta-item">👍 ${issue.upvotes}</span>` : ""}
+            ${issue.is_duplicate ? `<span class="badge badge-duplicate">Duplicate</span>` : ""}
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+            <div class="priority-bar" style="flex:1;margin-top:0">
+              <div class="priority-fill" style="width:${issue.priority_score||0}%;background:${priorityColor(issue.priority_score||0)}"></div>
+            </div>
+            <span class="text-xs text-muted">P:${issue.priority_score||0}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // ── Issue Detail ───────────────────────────────────────────────────────────
+    async function showDetail(id) {
+      const panel = document.getElementById("issue-detail-panel");
+      panel.innerHTML = `<div class="loading-overlay"><div class="spinner"></div></div>`;
+
+      try {
+        const { issue } = await apiFetch(`/issues/${id}`);
+        const res = issue.resolution || {};
+
+        panel.innerHTML = `
+          <div class="card" style="position:sticky;top:80px">
+            <div class="flex-between mb-16">
+              <h3 style="font-size:0.95rem">Issue Detail</h3>
+              <button onclick="upvote('${issue.id}')" class="btn btn-secondary btn-sm">👍 ${issue.upvotes||0}</button>
+            </div>
+
+            <div style="font-weight:700;margin-bottom:8px;line-height:1.4">${issue.title}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+              ${severityBadge(issue.severity)}
+              ${statusBadge(issue.status)}
+              <span class="badge badge-medium">${issue.category||"—"}</span>
+            </div>
+
+            <div class="text-sm text-muted mb-12">${issue.description}</div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+              <div style="background:var(--surface);border-radius:6px;padding:10px">
+                <div class="text-xs text-muted">Priority Score</div>
+                <div style="font-weight:800;font-size:1.3rem;color:${priorityColor(issue.priority_score||0)}">${issue.priority_score||0}</div>
+              </div>
+              <div style="background:var(--surface);border-radius:6px;padding:10px">
+                <div class="text-xs text-muted">SLA</div>
+                <div style="font-weight:700">${issue.sla_hours||"?"}h</div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="tabs-wrapper">
+              <div class="tabs">
+                <button class="tab-btn active" data-tab="t-info">Info</button>
+                <button class="tab-btn" data-tab="t-resolution">Resolution</button>
+                <button class="tab-btn" data-tab="t-history">History</button>
+              </div>
+
+              <div class="tab-content active" id="t-info">
+                <div style="display:flex;flex-direction:column;gap:8px" class="text-sm">
+                  <div class="flex-between"><span class="text-muted">Location</span><span>📍 ${issue.location}</span></div>
+                  <div class="flex-between"><span class="text-muted">Department</span><span>${issue.department||"—"}</span></div>
+                  <div class="flex-between"><span class="text-muted">Impact Area</span><span>${issue.impact_area||"—"}</span></div>
+                  <div class="flex-between"><span class="text-muted">Affected</span><span>${issue.affected_people_estimate||"?"} people</span></div>
+                  <div class="flex-between"><span class="text-muted">Health Risk</span><span>${issue.health_risk ? "⚠ Yes" : "No"}</span></div>
+                  <div class="flex-between"><span class="text-muted">Safety Risk</span><span>${issue.safety_risk ? "⚠ Yes" : "No"}</span></div>
+                  <div class="flex-between"><span class="text-muted">Reported</span><span>${formatDate(issue.created_at)}</span></div>
+                  <div class="flex-between"><span class="text-muted">Reporter</span><span>${issue.reporter_name||"Anonymous"}</span></div>
+                </div>
+                ${(issue.tags||[]).length ? `<div class="mt-12" style="display:flex;flex-wrap:wrap;gap:6px">${(issue.tags||[]).map(t=>`<span class="badge" style="background:var(--surface);color:var(--ink-2);border:1px solid var(--border)">#${t}</span>`).join("")}</div>` : ""}
+              </div>
+
+              <div class="tab-content" id="t-resolution">
+                <div class="ai-panel">
+                  <div class="ai-panel-header">✦ Gemini Recommendation</div>
+                  ${res.immediate_actions?.length ? `
+                    <div class="text-xs text-muted mb-4 fw-bold">IMMEDIATE ACTIONS</div>
+                    <ul style="list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:12px">
+                      ${res.immediate_actions.map(a=>`<li style="display:flex;gap:8px"><span style="color:var(--red)">●</span><span class="text-sm">${a}</span></li>`).join("")}
+                    </ul>
+                  ` : ""}
+                  ${res.long_term_solution ? `<div class="text-xs text-muted mb-4 fw-bold">LONG-TERM SOLUTION</div><p class="text-sm mb-12">${res.long_term_solution}</p>` : ""}
+                  ${res.citizen_advisory ? `<div style="background:var(--amber-light);border-radius:6px;padding:10px"><div class="text-xs fw-bold" style="color:var(--amber);margin-bottom:4px">CITIZEN ADVISORY</div><p class="text-sm">${res.citizen_advisory}</p></div>` : ""}
+                  ${res.estimated_resolution_days ? `<div class="text-xs text-muted mt-8">Est. resolution: ${res.estimated_resolution_days} days</div>` : ""}
+                </div>
+              </div>
+
+              <div class="tab-content" id="t-history">
+                <div class="timeline">
+                  ${(issue.history||[]).reverse().map(h=>`
+                    <div class="timeline-item">
+                      <div class="timeline-dot">📋</div>
+                      <div class="timeline-body">
+                        <div class="timeline-title">${h.action}</div>
+                        <div class="timeline-time">${h.actor} · ${timeAgo(h.timestamp)}</div>
+                      </div>
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+            <a href="/report" class="btn btn-secondary btn-sm" style="width:100%;justify-content:center">+ Report Similar Issue</a>
+          </div>
+        `;
+        initTabs(panel);
+        // scroll into view on mobile
+        if (window.innerWidth < 768) panel.scrollIntoView({ behavior: "smooth" });
+      } catch (e) {
+        panel.innerHTML = `<div class="card"><p class="text-muted">Failed to load issue.</p></div>`;
+      }
+    }
+
+    async function upvote(id) {
+      try {
+        const data = await apiFetch(`/issues/${id}/upvote`, { method: "POST" });
+        showToast(`👍 Upvoted! Total: ${data.upvotes}`, "success");
+        loadIssues();
+      } catch {}
+    }
+
+    // ── Filters ────────────────────────────────────────────────────────────────
+    document.querySelectorAll("[data-filter]").forEach(chip => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll("[data-filter]").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        activeFilter = chip.dataset.filter;
+        loadIssues();
+      });
+    });
+
+    document.querySelectorAll("[data-status]").forEach(chip => {
+      chip.addEventListener("click", () => {
+        if (chip.classList.contains("active")) { chip.classList.remove("active"); activeStatus = ""; }
+        else { document.querySelectorAll("[data-status]").forEach(c => c.classList.remove("active")); chip.classList.add("active"); activeStatus = chip.dataset.status; }
+        loadIssues();
+      });
+    });
+
+    let searchTimeout;
+    document.getElementById("search-input").addEventListener("input", (e) => {
+      clearTimeout(searchTimeout);
+      searchQuery = e.target.value.trim();
+      searchTimeout = setTimeout(() => loadIssues(), 400);
+    });
+
+    document.getElementById("load-more-btn").addEventListener("click", () => loadIssues(false));
+
+    // ── Init ───────────────────────────────────────────────────────────────────
+    loadStats();
+    loadIssues();
+
+    // Check if URL has id param
+    const urlId = new URLSearchParams(location.search).get("id");
+    if (urlId) setTimeout(() => showDetail(urlId), 800);
+  </script>
+</body>
+</html>

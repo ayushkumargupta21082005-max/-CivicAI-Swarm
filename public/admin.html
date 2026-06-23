@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel – CivicAI Swarm</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <a class="nav-logo" href="/"><div class="logo-icon">🏙️</div>CivicAI Swarm</a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/analytics">Analytics</a>
+      <a href="/admin" class="active">Admin</a>
+    </div>
+    <a href="/report" class="btn btn-primary btn-sm nav-cta">+ Report Issue</a>
+  </nav>
+
+  <div class="container page">
+    <div class="page-header flex-between">
+      <div>
+        <div class="section-eyebrow">Government Control Center</div>
+        <h1 class="page-title">Admin Panel</h1>
+        <p class="page-subtitle">Manage, assign, and resolve community issues</p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" id="seed-btn">🌱 Load Sample Data</button>
+        <button class="btn btn-primary" onclick="loadAll()">↺ Refresh</button>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid grid-4 mb-24">
+      <div class="stat-card accent-critical">
+        <div class="stat-label">Critical Issues</div>
+        <div class="stat-value" id="admin-critical">—</div>
+        <div class="stat-sub" id="admin-critical-sub"></div>
+      </div>
+      <div class="stat-card accent-high">
+        <div class="stat-label">Escalate Now</div>
+        <div class="stat-value" id="admin-escalate">—</div>
+        <div class="stat-sub">Requires immediate action</div>
+      </div>
+      <div class="stat-card accent-medium">
+        <div class="stat-label">Avg Priority</div>
+        <div class="stat-value" id="admin-avg-priority">—</div>
+        <div class="stat-sub">out of 100</div>
+      </div>
+      <div class="stat-card accent-good">
+        <div class="stat-label">Resolved This Week</div>
+        <div class="stat-value" id="admin-resolved-week">—</div>
+        <div class="stat-sub">Past 7 days</div>
+      </div>
+    </div>
+
+    <!-- Escalation Alerts -->
+    <div id="escalation-alerts" style="display:none" class="mb-24">
+      <div style="background:var(--red-light);border:1px solid var(--red);border-radius:var(--radius);padding:16px">
+        <div style="font-weight:700;color:var(--red);margin-bottom:10px">🚨 Immediate Escalation Required</div>
+        <div id="escalation-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+    </div>
+
+    <!-- Issues Table -->
+    <div class="card">
+      <div class="card-header">
+        <h3>All Issues</h3>
+        <div style="display:flex;gap:8px;align-items:center">
+        
+          <select class="form-control" id="admin-filter-status" style="height:34px;width:160px;padding:4px 10px" title="Filter by status">
+            <option value="">All Status</option>
+            <option>Open</option>
+            <option>In Progress</option>
+            <option>Resolved</option>
+            <option>Closed</option>
+          </select>
+          <select class="form-control" id="admin-filter-severity" style="height:34px;width:160px;padding:4px 10px" title="Filter by severity">
+            <option value="">All Severity</option>
+            <option>Critical</option>
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+          </select>
+          <input class="form-control" id="admin-search" placeholder="Search…" style="height:34px;width:200px;padding:4px 12px">
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="admin-table">
+          <thead>
+            <tr>
+              <th>Issue</th>
+              <th>Category</th>
+              <th>Severity</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Department</th>
+              <th>Reported</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-tbody">
+            <tr><td colspan="8" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal Template -->
+  <div id="edit-modal-container"></div>
+  <div id="toast-container"></div>
+
+  <script src="script.js"></script>
+  <script>
+    let allIssues = [];
+
+    async function loadAll() {
+      try {
+        const [issueData, analyticsData] = await Promise.all([
+          apiFetch("/issues?limit=200"),
+          apiFetch("/analytics")
+        ]);
+        allIssues = issueData.issues;
+        const a = analyticsData.analytics;
+
+        document.getElementById("admin-critical").textContent = a.bySeverity.Critical || 0;
+        document.getElementById("admin-critical-sub").textContent = `${a.bySeverity.High || 0} high severity`;
+        document.getElementById("admin-avg-priority").textContent = allIssues.length
+          ? Math.round(allIssues.reduce((s, i) => s + (i.priority_score || 0), 0) / allIssues.length)
+          : "—";
+        document.getElementById("admin-resolved-week").textContent = a.resolvedThisWeek || 0;
+
+        const escalate = allIssues.filter(i => i.escalate_immediately && i.status === "Open");
+        document.getElementById("admin-escalate").textContent = escalate.length;
+        if (escalate.length > 0) {
+          document.getElementById("escalation-alerts").style.display = "block";
+          document.getElementById("escalation-list").innerHTML = escalate.map(i => `
+            <div style="display:flex;align-items:center;justify-content:space-between;background:white;border-radius:6px;padding:10px 14px">
+              <div>
+                <strong class="text-sm">${i.title}</strong>
+                <span class="text-xs text-muted ml-8">📍 ${i.location}</span>
+              </div>
+              <div style="display:flex;gap:8px">
+                ${severityBadge(i.severity)}
+                <button class="btn btn-danger btn-sm" onclick="updateStatus('${i.id}', 'In Progress')">Assign Now</button>
+              </div>
+            </div>
+          `).join("");
+        }
+
+        renderTable(allIssues);
+      } catch (e) {
+        showToast("Failed to load data: " + e.message, "error");
+      }
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById("admin-tbody");
+      if (!data.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--ink-3)">No issues found</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = data.map(issue => `
+        <tr>
+          <td>
+            <div style="max-width:260px">
+              <div style="font-weight:600;font-size:0.88rem;margin-bottom:2px">${issue.title}</div>
+              <div class="text-xs text-muted truncate">📍 ${issue.location}</div>
+              ${issue.escalate_immediately ? `<span class="badge badge-critical" style="margin-top:4px">⚡ Escalate</span>` : ""}
+            </div>
+          </td>
+          <td><span class="text-sm">${issue.category || "—"}</span></td>
+          <td>${severityBadge(issue.severity)}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:40px;height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+                <div style="height:100%;width:${issue.priority_score||0}%;background:${priorityColor(issue.priority_score||0)};border-radius:2px"></div>
+              </div>
+              <span class="text-xs fw-bold" style="color:${priorityColor(issue.priority_score||0)}">${issue.priority_score||0}</span>
+            </div>
+          </td>
+          <td>${statusBadge(issue.status)}</td>
+          <td><span class="text-sm text-muted">${issue.department||"—"}</span></td>
+          <td><span class="text-xs text-muted">${timeAgo(issue.created_at)}</span></td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-secondary btn-sm" onclick="openEditModal('${issue.id}')">✏️ Edit</button>
+              <button class="btn btn-success btn-sm" onclick="updateStatus('${issue.id}','Resolved')">✓</button>
+              <button class="btn btn-secondary btn-sm" onclick="reanalyze('${issue.id}')" title="Re-analyze with AI">✦</button>
+            </div>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function filterTable() {
+      const status = document.getElementById("admin-filter-status").value;
+      const severity = document.getElementById("admin-filter-severity").value;
+      const search = document.getElementById("admin-search").value.toLowerCase();
+
+      let filtered = allIssues;
+      if (status) filtered = filtered.filter(i => i.status === status);
+      if (severity) filtered = filtered.filter(i => i.severity === severity);
+      if (search) filtered = filtered.filter(i =>
+        i.title.toLowerCase().includes(search) ||
+        i.location.toLowerCase().includes(search) ||
+        (i.category||"").toLowerCase().includes(search)
+      );
+      renderTable(filtered);
+    }
+
+    document.getElementById("admin-filter-status").addEventListener("change", filterTable);
+    document.getElementById("admin-filter-severity").addEventListener("change", filterTable);
+    let st; document.getElementById("admin-search").addEventListener("input", () => { clearTimeout(st); st = setTimeout(filterTable, 300); });
+
+    async function updateStatus(id, status) {
+      try {
+        await apiFetch(`/issues/${id}`, { method: "PATCH", body: JSON.stringify({ status, actor: "Admin" }) });
+        showToast(`Status updated to ${status}`, "success");
+        loadAll();
+      } catch (e) { showToast("Update failed: " + e.message, "error"); }
+    }
+
+    function openEditModal(id) {
+      const issue = allIssues.find(i => i.id === id);
+      if (!issue) return;
+
+      const container = document.getElementById("edit-modal-container");
+      container.innerHTML = `
+        <div class="modal-overlay" id="edit-overlay">
+          <div class="modal" style="max-width:560px">
+            <div class="modal-header">
+              <h3>Edit Issue</h3>
+              <button class="modal-close" onclick="document.getElementById('edit-overlay').remove()">✕</button>
+            </div>
+            <div style="font-weight:600;margin-bottom:4px">${issue.title}</div>
+            <div class="text-xs text-muted mb-16">${issue.id.slice(0,8)}</div>
+
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select class="form-control" id="edit-status">
+                <option ${issue.status==="Open"?"selected":""}>Open</option>
+                <option ${issue.status==="In Progress"?"selected":""}>In Progress</option>
+                <option ${issue.status==="Resolved"?"selected":""}>Resolved</option>
+                <option ${issue.status==="Closed"?"selected":""}>Closed</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Assigned To</label>
+              <input class="form-control" id="edit-assigned" value="${issue.assigned_to||""}" placeholder="Team or person name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Admin Notes</label>
+              <textarea class="form-control" id="edit-notes" rows="3" placeholder="Internal notes…">${issue.notes||""}</textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estimated Completion</label>
+              <input class="form-control" id="edit-completion" type="date" value="${issue.estimated_completion||""}">
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+              <button class="btn btn-secondary" onclick="document.getElementById('edit-overlay').remove()">Cancel</button>
+              <button class="btn btn-primary" onclick="saveEdit('${issue.id}')">Save Changes</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    async function saveEdit(id) {
+      const payload = {
+        status: document.getElementById("edit-status").value,
+        assigned_to: document.getElementById("edit-assigned").value,
+        notes: document.getElementById("edit-notes").value,
+        estimated_completion: document.getElementById("edit-completion").value,
+        actor: "Admin",
+      };
+      try {
+        await apiFetch(`/issues/${id}`, { method: "PATCH", body: JSON.stringify(payload) });
+        document.getElementById("edit-overlay").remove();
+        showToast("Issue updated!", "success");
+        loadAll();
+      } catch (e) { showToast("Save failed: " + e.message, "error"); }
+    }
+
+    async function reanalyze(id) {
+      showToast("Re-analyzing with Gemini AI…", "info");
+      try {
+        await apiFetch(`/ai/reprioritize/${id}`, { method: "POST" });
+        showToast("Priority updated by Gemini AI!", "success");
+        loadAll();
+      } catch (e) { showToast("Analysis failed: " + e.message, "error"); }
+    }
+
+    document.getElementById("seed-btn").addEventListener("click", async () => {
+      const btn = document.getElementById("seed-btn");
+      btn.disabled = true;
+      btn.textContent = "Loading…";
+      showToast("Seeding sample data with Gemini AI analysis… this takes ~30s", "info", 30000);
+      try {
+        const data = await fetch("/api/seed", { method: "POST" });
+        const json = await data.json();
+        showToast(`Loaded ${json.seeded} sample issues!`, "success");
+        loadAll();
+      } catch (e) {
+        showToast("Seed failed: " + e.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "🌱 Load Sample Data";
+      }
+    });
+
+    loadAll();
+  </script>
+</body>
+</html>

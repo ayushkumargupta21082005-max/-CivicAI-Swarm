@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics – CivicAI Swarm</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <a class="nav-logo" href="/"><div class="logo-icon">🏙️</div>CivicAI Swarm</a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/analytics" class="active">Analytics</a>
+      <a href="/admin">Admin</a>
+    </div>
+    <a href="/report" class="btn btn-primary btn-sm nav-cta">+ Report Issue</a>
+  </nav>
+
+  <div class="container page">
+    <div class="page-header flex-between">
+      <div>
+        <div class="section-eyebrow">AI-Powered Insights</div>
+        <h1 class="page-title">Community Analytics</h1>
+        <p class="page-subtitle">Real-time analysis of all civic issues powered by Gemini</p>
+      </div>
+      <button class="btn btn-primary" id="run-trends-btn">✦ Run Trend Prediction</button>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="grid grid-4 mb-24">
+      <div class="stat-card accent-critical">
+        <div class="stat-icon">🏙️</div>
+        <div class="stat-label">Total Issues</div>
+        <div class="stat-value" id="kpi-total">—</div>
+      </div>
+      <div class="stat-card accent-high">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-label">Critical Active</div>
+        <div class="stat-value" id="kpi-critical">—</div>
+      </div>
+      <div class="stat-card accent-good">
+        <div class="stat-icon">✅</div>
+        <div class="stat-label">Resolution Rate</div>
+        <div class="stat-value" id="kpi-rate">—</div>
+      </div>
+      <div class="stat-card accent-medium">
+        <div class="stat-icon">⏱</div>
+        <div class="stat-label">Avg Resolution</div>
+        <div class="stat-value" id="kpi-avg-days">—</div>
+        <div class="stat-sub">days</div>
+      </div>
+    </div>
+
+    <!-- AI Trend Prediction -->
+    <div id="trend-panel" style="display:none" class="card mb-24">
+      <div class="card-header">
+        <div class="flex-center gap-10">
+          <h3>✦ Gemini Trend Prediction</h3>
+          <span class="ai-badge">Live Analysis</span>
+        </div>
+        <span class="text-xs text-muted" id="trend-time"></span>
+      </div>
+      <div id="trend-content">
+        <div class="loading-overlay"><div class="spinner"></div><span>Gemini AI analyzing trends…</span></div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-2 mb-24">
+      <!-- By Category -->
+      <div class="card">
+        <div class="card-header"><h3>Issues by Category</h3></div>
+        <div id="chart-category">
+          <div class="loading-overlay"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- By Severity -->
+      <div class="card">
+        <div class="card-header"><h3>Severity Distribution</h3></div>
+        <div id="chart-severity" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2 mb-24">
+      <!-- By Status -->
+      <div class="card">
+        <div class="card-header"><h3>Status Overview</h3></div>
+        <div id="chart-status"></div>
+      </div>
+
+      <!-- By Department -->
+      <div class="card">
+        <div class="card-header"><h3>Issues by Department</h3></div>
+        <div id="chart-dept">
+          <div class="loading-overlay"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Trend -->
+    <div class="card mb-24">
+      <div class="card-header"><h3>Daily Reporting Trend (Last 14 Days)</h3></div>
+      <div id="chart-daily" style="display:flex;align-items:flex-end;gap:6px;height:120px;padding:10px 0"></div>
+    </div>
+
+    <!-- Top Wards -->
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header"><h3>Top 10 Problem Areas</h3></div>
+        <div id="chart-wards">
+          <div class="loading-overlay"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- Resolution metrics -->
+      <div class="card">
+        <div class="card-header"><h3>Resolution Metrics</h3></div>
+        <div id="resolution-metrics" style="display:flex;flex-direction:column;gap:14px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="script.js"></script>
+  <script>
+    async function loadAnalytics() {
+      try {
+        const { analytics } = await apiFetch("/analytics");
+        const a = analytics;
+
+        // KPIs
+        document.getElementById("kpi-total").textContent = a.total;
+        document.getElementById("kpi-critical").textContent = a.criticalOpen || 0;
+        const rate = a.total ? Math.round(((a.byStatus.Resolved||0) / a.total) * 100) : 0;
+        document.getElementById("kpi-rate").textContent = rate + "%";
+        document.getElementById("kpi-avg-days").textContent = a.avgResolutionDays || "—";
+
+        // Category chart
+        renderBarChart(document.getElementById("chart-category"), a.byCategory, "#1a6cf5");
+
+        // Severity donut-style bars
+        const sevColors = { Critical: "#d63b3b", High: "#e07d10", Medium: "#1a6cf5", Low: "#0d9e6a" };
+        const sevContainer = document.getElementById("chart-severity");
+        sevContainer.innerHTML = Object.entries(sevColors).map(([sev, color]) => {
+          const count = a.bySeverity[sev] || 0;
+          const pct = a.total ? Math.round((count / a.total) * 100) : 0;
+          return `
+            <div>
+              <div class="flex-between mb-4">
+                <div class="flex-center gap-8">
+                  <div style="width:10px;height:10px;border-radius:50%;background:${color}"></div>
+                  <span class="text-sm fw-bold">${sev}</span>
+                </div>
+                <span class="text-sm fw-bold">${count} <span class="text-muted">(${pct}%)</span></span>
+              </div>
+              <div style="height:10px;background:var(--surface);border-radius:5px;overflow:hidden">
+                <div style="height:100%;width:${pct}%;background:${color};border-radius:5px;transition:width 1s ease"></div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        // Status chart
+        const statusColors = { Open: "#1a6cf5", "In Progress": "#e07d10", Resolved: "#0d9e6a", Closed: "#9ca3af" };
+        const statusContainer = document.getElementById("chart-status");
+        statusContainer.innerHTML = `<div style="display:flex;flex-direction:column;gap:12px">` + Object.entries(a.byStatus).map(([status, count]) => {
+          const pct = a.total ? Math.round((count / a.total) * 100) : 0;
+          return `
+            <div>
+              <div class="flex-between mb-4">
+                <span class="text-sm fw-bold">${status}</span>
+                <span class="text-sm fw-bold">${count} (${pct}%)</span>
+              </div>
+              <div style="height:8px;background:var(--surface);border-radius:4px;overflow:hidden">
+                <div style="height:100%;width:${pct}%;background:${statusColors[status]||"#9ca3af"};border-radius:4px;transition:width 1s ease"></div>
+              </div>
+            </div>
+          `;
+        }).join("") + `</div>`;
+
+        // Department chart
+        renderBarChart(document.getElementById("chart-dept"), a.byDepartment, "#7c3aed");
+
+        // Daily trend
+        const dailyContainer = document.getElementById("chart-daily");
+        const last14 = [];
+        for (let i = 13; i >= 0; i--) {
+          const d = new Date(Date.now() - i * 86400000).toISOString().split("T")[0];
+          last14.push({ date: d, count: a.dailyTrend[d] || 0 });
+        }
+        const maxD = Math.max(...last14.map(d => d.count), 1);
+        dailyContainer.innerHTML = last14.map(d => `
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+            <span style="font-size:0.7rem;font-weight:700;color:var(--accent)">${d.count||""}</span>
+            <div style="width:100%;background:${d.count > 0 ? "var(--accent)" : "var(--border)"};height:${Math.max((d.count/maxD)*100, 4)}px;border-radius:3px 3px 0 0;transition:height 0.5s ease"></div>
+            <span style="font-size:0.62rem;color:var(--ink-3);transform:rotate(-45deg);transform-origin:center">${d.date.slice(5)}</span>
+          </div>
+        `).join("");
+
+        // Top wards
+        if (a.topWards.length) {
+          const wardData = {};
+          a.topWards.forEach(w => wardData[w.ward] = w.count);
+          renderBarChart(document.getElementById("chart-wards"), wardData, "#e07d10");
+        }
+
+        // Resolution metrics
+        document.getElementById("resolution-metrics").innerHTML = `
+          <div class="stat-card" style="box-shadow:none;border:1px solid var(--border)">
+            <div class="stat-label">Issues Resolved This Week</div>
+            <div class="stat-value" style="font-size:1.5rem">${a.resolvedThisWeek || 0}</div>
+          </div>
+          <div class="stat-card" style="box-shadow:none;border:1px solid var(--border)">
+            <div class="stat-label">Open Issues</div>
+            <div class="stat-value" style="font-size:1.5rem;color:var(--accent)">${a.byStatus.Open || 0}</div>
+          </div>
+          <div class="stat-card" style="box-shadow:none;border:1px solid var(--border)">
+            <div class="stat-label">Avg Resolution Time</div>
+            <div class="stat-value" style="font-size:1.5rem;color:var(--green)">${a.avgResolutionDays || "—"} days</div>
+          </div>
+          <div class="stat-card" style="box-shadow:none;border:1px solid var(--border)">
+            <div class="stat-label">Escalation Required</div>
+            <div class="stat-value" style="font-size:1.5rem;color:var(--red)">${a.criticalOpen || 0}</div>
+          </div>
+        `;
+
+      } catch (e) {
+        showToast("Failed to load analytics: " + e.message, "error");
+      }
+    }
+
+    document.getElementById("run-trends-btn").addEventListener("click", async () => {
+      const btn = document.getElementById("run-trends-btn");
+      btn.disabled = true;
+      btn.textContent = "Analyzing…";
+
+      document.getElementById("trend-panel").style.display = "block";
+      document.getElementById("trend-content").innerHTML = `<div class="loading-overlay"><div class="spinner"></div><span>Gemini AI is analyzing community trends…</span></div>`;
+
+      try {
+        const { trends } = await apiFetch("/ai/trends");
+        const t = trends;
+
+        const healthColors = { Excellent: "#0d9e6a", Good: "#0d9e6a", Fair: "#e07d10", Poor: "#d63b3b", Critical: "#d63b3b" };
+        const healthColor = healthColors[t.overall_community_health] || "#1a6cf5";
+
+        document.getElementById("trend-time").textContent = new Date().toLocaleTimeString();
+        document.getElementById("trend-content").innerHTML = `
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
+            <div>
+              <div class="form-label mb-10">🔥 Hot Categories (Trend)</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                ${(t.hot_categories||[]).map(c => `
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface);border-radius:6px">
+                    <span class="text-sm">${c.category}</span>
+                    <div style="display:flex;align-items:center;gap:6px">
+                      <span class="text-xs" style="color:${c.trend==="rising"?"var(--red)":c.trend==="declining"?"var(--green)":"var(--ink-3)"}">
+                        ${c.trend==="rising"?"↑":c.trend==="declining"?"↓":"→"} ${c.trend}
+                      </span>
+                      <span class="text-xs fw-bold">${c.percentage}%</span>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+
+            <div>
+              <div class="form-label mb-10">⚠️ Emerging Problems</div>
+              <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
+                ${(t.emerging_problems||[]).map(p => `<li style="display:flex;gap-8px;align-items:flex-start"><span style="color:var(--amber);margin-right:8px">●</span><span class="text-sm">${p}</span></li>`).join("")}
+              </ul>
+              <div class="form-label mb-10 mt-16">📍 High Risk Areas</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                ${(t.high_risk_areas||[]).map(a => `<span class="badge badge-high">${a}</span>`).join("")}
+              </div>
+            </div>
+
+            <div>
+              <div style="text-align:center;padding:20px;background:var(--surface);border-radius:8px;margin-bottom:16px">
+                <div class="text-xs text-muted mb-4">Community Health Score</div>
+                <div style="font-size:3rem;font-weight:800;color:${healthColor}">${t.health_score}</div>
+                <div style="font-weight:700;color:${healthColor}">${t.overall_community_health}</div>
+              </div>
+              <div class="form-label mb-8">Next Week Predictions</div>
+              <ul style="list-style:none;display:flex;flex-direction:column;gap:4px">
+                ${(t.predicted_next_week||[]).map(p=>`<li class="text-sm">🔮 ${p}</li>`).join("")}
+              </ul>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div>
+            <div class="form-label mb-8">💡 Intervention Suggestions</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              ${(t.intervention_suggestions||[]).map(s=>`<div style="background:var(--accent-light);color:var(--accent);padding:6px 14px;border-radius:6px;font-size:0.85rem;font-weight:500">${s}</div>`).join("")}
+            </div>
+          </div>
+          <div class="mt-12 text-xs text-muted">Seasonal pattern: ${t.seasonal_pattern}</div>
+        `;
+        showToast("Trend analysis complete!", "success");
+      } catch (e) {
+        document.getElementById("trend-content").innerHTML = `<div class="empty-state"><p>Trend analysis failed: ${e.message}</p></div>`;
+        showToast("Trend analysis failed", "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "✦ Run Trend Prediction";
+      }
+    });
+
+    loadAnalytics();
+  </script>
+</body>
+</html>

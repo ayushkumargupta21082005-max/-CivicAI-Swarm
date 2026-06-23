@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicAI Swarm – Hyperlocal Problem Solver</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <a class="nav-logo" href="/">
+      <div class="logo-icon">🏙️</div>
+      CivicAI Swarm
+    </a>
+    <div class="nav-links">
+      <a href="/" class="active">Home</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/analytics">Analytics</a>
+      <a href="/admin">Admin</a>
+    </div>
+    <a href="/report" class="btn btn-primary btn-sm nav-cta">+ Report Issue</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-eyebrow">⚡ Powered by Google Gemini 2.5 Pro</div>
+      <h1>Your community's voice,<br><span>amplified by AI</span></h1>
+      <p class="hero-sub">Report civic problems in seconds. Gemini AI instantly classifies, prioritizes, and recommends resolutions — connecting citizens with government action.</p>
+      <div class="hero-actions">
+        <a href="/report" class="btn btn-primary btn-lg">📸 Report an Issue</a>
+        <a href="/dashboard" class="btn btn-secondary btn-lg" style="background:rgba(255,255,255,0.1);color:white;border-color:rgba(255,255,255,0.2)">View Dashboard</a>
+      </div>
+      <div class="hero-stats" id="hero-stats">
+        <div><div class="hero-stat-num" id="stat-total">—</div><div class="hero-stat-label">Issues Reported</div></div>
+        <div><div class="hero-stat-num" id="stat-resolved">—</div><div class="hero-stat-label">Resolved</div></div>
+        <div><div class="hero-stat-num" id="stat-critical">—</div><div class="hero-stat-label">Critical Active</div></div>
+        <div><div class="hero-stat-num">AI</div><div class="hero-stat-label">Instant Analysis</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" style="background:white">
+    <div class="container">
+      <div class="section-title">
+        <div class="section-eyebrow">AI Features</div>
+        <h2>Gemini AI does the heavy lifting</h2>
+        <p style="color:var(--ink-3);margin-top:8px">Six intelligent modules process every report automatically</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="card">
+          <div style="font-size:2rem;margin-bottom:12px">🏷️</div>
+          <h3>Issue Classification</h3>
+          <p class="mt-8 text-sm">Automatically categorizes issues into Roads, Water, Electricity, Safety, and 10+ other categories with department routing.</p>
+          <div class="mt-12"><span class="ai-badge">✦ Gemini Vision</span></div>
+        </div>
+        <div class="card">
+          <div style="font-size:2rem;margin-bottom:12px">🚨</div>
+          <h3>Severity Detection</h3>
+          <p class="mt-8 text-sm">Evaluates health risk, safety risk, affected population and assigns Critical/High/Medium/Low severity scores.</p>
+          <div class="mt-12"><span class="ai-badge">✦ Gemini 2.5 Pro</span></div>
+        </div>
+        <div class="card">
+          <div style="font-size:2rem;margin-bottom:12px">🔍</div>
+          <h3>Duplicate Detection</h3>
+          <p class="mt-8 text-sm">Compares new reports against all existing issues to prevent duplication and auto-merge related complaints.</p>
+          <div class="mt-12"><span class="ai-badge">✦ Gemini 2.5 Pro</span></div>
+        </div>
+        <div class="card">
+          <div style="font-size:2rem;margin-bottom:12px">📊</div>
+          <h3>Priority Scoring</h3>
+          <p class="mt-8 text-sm">Calculates a 0-100 priority score using urgency, impact, community demand, and SLA timelines for every issue.</p>
+          <div class="mt-12"><span class="ai-badge">✦ Gemini 2.5 Pro</span></div>
+        </div>
+        <div class="card">
+          <div style="font-size:2rem;margin-bottom:12px">💡</div>
+          <h3>Resolution Recommendation</h3>
+          <p class="mt-8 text-sm">Generates immediate actions, step-by-step resolution plans, and citizen advisories tailored to each specific issue.</p>
+          <div class="mt-12"><span class="ai-badge">✦ Gemini 2.5 Pro</span></div>
+        </div>
+        <div class="card">
+          <div style="font-size:2rem;margin-bottom:12px">📈</div>
+          <h3>Trend Prediction</h3>
+          <p class="mt-8 text-sm">Analyzes patterns across all reports to identify hot zones, emerging crises, and seasonal trends before they escalate.</p>
+          <div class="mt-12"><span class="ai-badge">✦ Gemini 2.5 Pro</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <div class="section-eyebrow">Workflow</div>
+        <h2>From report to resolution</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-title">Citizen Reports</div>
+          <div class="step-desc">Upload a photo or describe the issue in a few words</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-title">Gemini Analyzes</div>
+          <div class="step-desc">AI classifies, scores severity, and detects duplicates instantly</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-title">Auto-Routed</div>
+          <div class="step-desc">Issue sent to correct department with resolution recommendations</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-title">Tracked & Resolved</div>
+          <div class="step-desc">Citizens track progress in real-time until resolution</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Issues -->
+  <section class="section" style="background:white">
+    <div class="container">
+      <div class="flex-between mb-24">
+        <div>
+          <div class="section-eyebrow">Live Feed</div>
+          <h2>Recent community issues</h2>
+        </div>
+        <a href="/dashboard" class="btn btn-secondary">View all →</a>
+      </div>
+      <div class="grid grid-auto" id="recent-issues">
+        <div class="loading-overlay" style="grid-column:1/-1">
+          <div class="spinner"></div>
+          <span>Loading issues…</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" style="background:linear-gradient(135deg,#0a1628,#1a3a6e);color:white;text-align:center">
+    <div class="container">
+      <h2 style="color:white;margin-bottom:12px">See a problem? Report it now.</h2>
+      <p style="color:rgba(255,255,255,0.65);margin-bottom:28px">Takes 30 seconds. Gemini AI handles the rest.</p>
+      <a href="/report" class="btn btn-primary btn-lg">📸 Report an Issue Free</a>
+    </div>
+  </section>
+
+  <footer style="background:var(--ink);color:rgba(255,255,255,0.5);padding:24px;text-align:center;font-size:0.85rem">
+    CivicAI Swarm &nbsp;·&nbsp; Community Hero – Hyperlocal Problem Solver &nbsp;·&nbsp; Powered by Google Gemini 2.5 Pro
+  </footer>
+
+  <div id="toast-container"></div>
+  <script src="script.js"></script>
+  <script>
+    async function loadStats() {
+      try {
+        const { analytics } = await apiFetch("/analytics");
+        document.getElementById("stat-total").textContent = analytics.total;
+        document.getElementById("stat-resolved").textContent = analytics.byStatus.Resolved || 0;
+        document.getElementById("stat-critical").textContent = analytics.criticalOpen || 0;
+      } catch {}
+    }
+
+    async function loadRecent() {
+      const container = document.getElementById("recent-issues");
+      try {
+        const { issues } = await apiFetch("/issues?limit=6");
+        if (!issues.length) {
+          container.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+            <div class="empty-state-icon">🏙️</div>
+            <h3>No issues yet</h3>
+            <p>Be the first to report a community issue.</p>
+            <a href="/report" class="btn btn-primary">Report an Issue</a>
+          </div>`;
+          return;
+        }
+        container.innerHTML = issues.map(issue => `
+          <a href="/dashboard?id=${issue.id}" style="text-decoration:none">
+            <div class="issue-card ${severityClass(issue.severity)}">
+              <div class="issue-card-header">
+                <div class="issue-card-title">${issue.title}</div>
+                ${severityBadge(issue.severity)}
+              </div>
+              <div class="issue-card-desc">${issue.description}</div>
+              <div class="issue-card-meta">
+                <span class="issue-meta-item">📍 ${issue.location}</span>
+                <span class="issue-meta-item">🕐 ${timeAgo(issue.created_at)}</span>
+                ${statusBadge(issue.status)}
+              </div>
+              <div class="priority-bar mt-8">
+                <div class="priority-fill" style="width:${issue.priority_score||0}%;background:${priorityColor(issue.priority_score||0)}"></div>
+              </div>
+            </div>
+          </a>
+        `).join("");
+      } catch (e) {
+        container.innerHTML = `<p class="text-muted" style="grid-column:1/-1">Failed to load issues. Is the server running?</p>`;
+      }
+    }
+
+    loadStats();
+    loadRecent();
+  </script>
+</body>
+</html>

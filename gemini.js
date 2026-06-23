@@ -23,6 +23,15 @@ function safeJSON(text) {
   }
 }
 
+async function safeGeminiCall(fn, fallback) {
+  try {
+    return await fn();
+  } catch (error) {
+    console.log("Gemini Error:", error.message);
+    return fallback;
+  }
+}
+
 // ── 1. Issue Classification ───────────────────────────────────────────────────
 
 export async function classifyIssue(title, description, location) {
@@ -301,10 +310,30 @@ Respond with ONLY this JSON:
 // ── 8. Batch AI Analysis (full pipeline) ─────────────────────────────────────
 
 export async function fullIssueAnalysis(title, description, location, existingIssues = []) {
-  const [classification, severity] = await Promise.all([
-    classifyIssue(title, description, location),
-    detectSeverity(title, description, ""),
-  ]);
+
+  const classification = await safeGeminiCall(
+    () => classifyIssue(title, description, location),
+    {
+      category: "Roads & Infrastructure",
+      subcategory: "General",
+      department: "Municipal Corporation",
+      tags: ["community"],
+      confidence: 50,
+    }
+  );
+
+  const severity = await safeGeminiCall(
+    () => detectSeverity(title, description, classification.category),
+    {
+      severity: "Medium",
+      severity_score: 5,
+      impact_area: "Neighborhood",
+      affected_people_estimate: 100,
+      health_risk: false,
+      safety_risk: false,
+      reasoning: "Fallback severity assessment",
+    }
+  );
 
   const enrichedIssue = {
     title,
@@ -314,11 +343,42 @@ export async function fullIssueAnalysis(title, description, location, existingIs
     ...severity,
   };
 
-  const [duplicates, priority, resolution] = await Promise.all([
-    detectDuplicates({ title, description, location }, existingIssues),
-    scorePriority(enrichedIssue),
-    recommendResolution(enrichedIssue),
-  ]);
+  const duplicates = await safeGeminiCall(
+    () => detectDuplicates({ title, description, location }, existingIssues),
+    {
+      is_duplicate: false,
+      duplicate_ids: [],
+      similarity_scores: {},
+      recommendation: "new_report",
+    }
+  );
+
+  const priority = await safeGeminiCall(
+    () => scorePriority(enrichedIssue),
+    {
+      priority_score: 50,
+      priority_label: "P3-Medium",
+      urgency_factor: 5,
+      impact_factor: 5,
+      community_demand_factor: 5,
+      escalate_immediately: false,
+      sla_hours: 72,
+    }
+  );
+
+  const resolution = await safeGeminiCall(
+    () => recommendResolution(enrichedIssue),
+    {
+      immediate_actions: ["Acknowledge report"],
+      short_term_steps: ["Inspect issue", "Assign team"],
+      long_term_solution: "Scheduled maintenance",
+      responsible_teams: ["Municipal Works"],
+      estimated_resolution_days: 7,
+      resources_needed: ["Labor"],
+      success_metrics: ["Issue resolved"],
+      citizen_advisory: "Avoid affected area until fixed",
+    }
+  );
 
   return {
     classification,
